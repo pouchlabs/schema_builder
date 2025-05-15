@@ -1,1 +1,4 @@
-// Reexport your entry components here
+import Schema from "./schema.svelte";
+export{
+    Schema
+}
