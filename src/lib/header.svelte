@@ -1,9 +1,23 @@
 <script>
   let {schema_id}=$props();
-    import {addBlock} from "./utils.js";
+    import {addBlock,BlockInit,loadSchema,updateSchema} from "./utils.js";
 import Block from "./blocks/block.svelte";
-	import { nanoid } from "nanoid/non-secure";
-
+import { mount } from "svelte";
+async function initOnAdd(id,block){
+   //mount 
+   mount(Block,{target:document.querySelector(".cont"),props:{
+                block:block,
+                schema_id:schema_id
+              }})
+  let block_to_add = block;
+    if(block_to_add){
+       let schema_to_update = await loadSchema(id);
+       if(schema_to_update && typeof schema_to_update.blocks === typeof []){
+       schema_to_update.blocks?.push(block_to_add);
+       updateSchema(id,schema_to_update)
+       }
+    }
+}
 </script>
 <div class="navbar sticky top-1 z-50 min-h-8 h-12 bg-base-100 shadow-2xl">
     <div class="navbar-start">
@@ -15,12 +29,15 @@ import Block from "./blocks/block.svelte";
           tabindex="0"
           class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-auto p-2 shadow-2xl">
           <li>
-              <button onclick={()=>addBlock(Block,{target:document.querySelector(".cont"),props:{
-                id:nanoid(16),
-                type:"text",
-                schema_id:schema_id
-              }})}>add text</button>
+              <button onclick={(e)=>{let newblock = new BlockInit("text"); 
+              initOnAdd(schema_id,newblock);
+              }}>add text</button>
           </li>
+          <li>
+            <button onclick={(e)=>{let newblock = new BlockInit("email"); 
+            initOnAdd(schema_id,newblock);
+            }}>add email</button>
+        </li>
           <li><a>Portfolio</a></li>
           <li><a>About</a></li>
         </ul>
@@ -31,5 +48,6 @@ import Block from "./blocks/block.svelte";
     </div>
     <div class="navbar-end">
      b
+   
     </div>
   </div>

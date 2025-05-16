@@ -40,8 +40,10 @@
     let mSchema = z.object({
 
     })
-   
+   let testschema={schema_id:"kkb",blocks:[{id:"1",name:"userName",type:"text",required:false,default:""},{id:"2",name:"email",type:"email",required:true,default:""}]}
     </script>
-<Schema></Schema>
+<Schema  onSchemaChange={(s)=>{
+console.log(s,"change")
+}}></Schema>
     
     
