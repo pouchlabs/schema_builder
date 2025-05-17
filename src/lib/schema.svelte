@@ -1,5 +1,5 @@
 <script>
-import {setSchema,SchemaEmitter, updateSchema} from "./utils.js";
+import {setSchema,SchemaEmitter, updateSchema,loadSchema} from "./utils.js";
 import './schema.css';
 let {id=crypto.randomUUID(),open=false,schema,onSchemaChange=()=>{}}=$props();
 import Header from "./header.svelte";
@@ -7,10 +7,14 @@ import Footer from "./footer.svelte";
 import Container from "./container.svelte";
 let state_schema=$state(schema)
 $effect(async ()=>{
-   if(schema && typeof schema === typeof {}){
+   if(state_schema && typeof state_schema === typeof {}){
     //save provided schema
      if(schema.schema_id && schema.blocks){
-      updateSchema(schema.schema_id,schema);
+      if(!await loadSchema(state_schema?.schema_id || id)){
+      setSchema(state_schema.schema_id,state_schema);
+      }else{
+        updateSchema(state_schema.schema_id,state_schema);
+      }
      }
    }else{
    //not provided
@@ -19,9 +23,13 @@ $effect(async ()=>{
 
   //listeners
   SchemaEmitter.on("schema_update",(data)=>{
+    SchemaEmitter.emit(`schema_reorder${schema?.schema_id || id}`)
     if(typeof onSchemaChange === "function"){
       return onSchemaChange(data);
     }
+    //
+   
+
   })
 }) 
 </script>
@@ -34,17 +42,12 @@ $effect(async ()=>{
 <div class:modal-open={open === true} class="modal" role="dialog">
   <div class="modal-box py-1 px-2 min-w-[100vw] max-w-[100vw] h-[100vh]">
       <Header schema_id="{state_schema?.schema_id || id}"></Header>
-      <section class="flex p-2 gap-2 align-content-center">
-           <div class="w-12 z-5 fixed top-14 left-1">
-            <div class="dropdown dropdown-right dropdown-end">
-                <div tabindex="0" role="button" class="btn m-1">Click ➡️</div>
-                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-                  <li><a>Item 1</a></li>
-                  <li><a>Item 2</a></li>
-                </ul>
-              </div>
-           </div>
+      <section class="flex flex-column p-2 gap-2 overflow-y-auto flex-wrap py-3 px-2">
+           n
            <Container id={state_schema?.schema_id || id}  bind:schema={state_schema} ></Container>
+           <footer class="sticky bottom-0 h-[40px] ">
+              foo
+           </footer>
       </section>
         
   </div>

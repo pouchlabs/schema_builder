@@ -1,11 +1,12 @@
 <script>
 import deepmerge from "deepmerge";
 import {setSchema,loadSchema,noscript,findBlockById,updateSchema,getAllBlocks} from "../utils.js";
+	import { boolean } from "zod";
 
   let {block,schema_id}=$props();
 let opts = ["text","number","boolean","json"];
 let can_save = $state(false);
-
+let txt = $state(block.type);
 async function saveOnEdit(data){
   if(JSON.parse(data).name && JSON.parse(data).name.length >= 2 ){
   can_save = true;
@@ -46,12 +47,14 @@ $effect(async ()=>{
 <div  class="modal  modal-bottom sm:modal-middle" role="dialog">
   <div class="modal-box">
       
-<form id="field_form{block.id}" data-type={block.type} data-fields="{JSON.stringify(block)}"  >
+<form id="field_form{block.id}" data-type={block.type} data-fields="{JSON.stringify(block)}" class="form_{schema_id}"  >
  
  <select onchange={async(e)=>{
- 
-      document.getElementById(`type_holder${block.id}`).innerText=e.target.value;
-      block.type = e.target.value.toLowerCase();
+     let el = e.target;
+        
+      document.getElementById(`type_holder${block.id}`).innerText=el.value;
+      block.type = el.value.toLowerCase();
+      txt = block.type;
       let form = document.getElementById(`field_form${block.id}`);
       form.dataset.fields = JSON.stringify(block)
        //event
@@ -65,18 +68,21 @@ $effect(async ()=>{
     <option selected={block.type === "email"}>Email</option>
     <option selected={block.type === "boolean"}>Boolean</option>
     <option selected={block.type === "json"}>Json</option>
+    <option selected={block.type === "date"}>Date</option>
+    <option selected={block.type === "time"}>Time</option>
   </select>
   <label class="input my-2">
     <input oninput={async(e)=>{
       e.target.value = e.target.value;
        let el = document.getElementById(`name_holder${block.id}`).innerText=e.target.value;
-       block.name = el;
+       block.name = noscript(el).trim();
+        txt = block.type;
        let form = document.getElementById(`field_form${block.id}`);
         form.dataset.fields = JSON.stringify(block)
       //event
       
       saveOnEdit(form.dataset.fields)
-      form.focus()
+      //form.focus()
    }
      } type="text" required min="1" max="100" value="{block.name}" name="field_name" id="field_name{block.id}" placeholder="Field Name" />
   
@@ -84,17 +90,49 @@ $effect(async ()=>{
   </label> 
 
 
-   {#if block.type === "text"  }
-  <textarea name="field_default" id="field_default{block.id}" placeholder="default" value="{block.default}" class="textarea textarea-xs"></textarea>
-  <input type="number" min="0" name="field_min" id="field_min{block.id}" value="1" placeholder="Field min chars" class="input" />
-  <input type="number" min="0" name="field_max" id="field_max{block.id}" value="0" placeholder="Field max chars" class="input" />
+   {#if txt === "text"}
+   <fieldset class="fieldset">
+    <legend class="fieldset-legend">default</legend>
+    <textarea oninput={async(e)=>{
+      let el = e.target;
+       block.default = el.value;
+       txt=block.type
+       let form = document.getElementById(`field_form${block.id}`);
+       form.dataset.fields = JSON.stringify(block)
+        //event
+       saveOnEdit(form.dataset.fields)
+       //form.focus()
+ }} name="field_default" id="field_default{block.id}" placeholder="default" value="{block.default}" class="textarea my-2 textarea-xs"></textarea>
+ 
+   </fieldset>
+   
+    
+
+  <input type="number" min="0" name="field_min" id="field_min{block.id}" value="1" placeholder="Field min chars" class="input my-2" />
+   <span>max</span>
+  <input type="number" min="0" name="field_max" id="field_max{block.id}" value="0" placeholder="Field max chars" class="input my-2" />
+   {:else if "date" || "time" || "email"}
+   <label class="input">
+    <input oninput={async(e)=>{
+      let el = e.target;
+       block.default = el.value;
+       txt = block.type;
+       let form = document.getElementById(`field_form${block.id}`);
+       form.dataset.fields = JSON.stringify(block)
+        //event
+       saveOnEdit(form.dataset.fields)
+       //form.focus()
+ }} type="{txt}" value="{block.default}" class="grow" placeholder="default {txt}" />
+    <span class="badge badge-neutral badge-xs">default {txt}</span>
+  </label>
   {/if}
+
   <fieldset class="fieldset bg-base-100 border-base-300 rounded-box w-64 border p-4">
     <legend class="fieldset-legend">options</legend>
     <label name="field_required" id="field_required{block.id}" class="label">
       <input type="checkbox"  class="checkbox" />
       Required
-    </label>
+    </label>  
 
   </fieldset>
 

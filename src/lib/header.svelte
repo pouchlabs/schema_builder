@@ -3,10 +3,12 @@
     import {addBlock,BlockInit,loadSchema,updateSchema} from "./utils.js";
 import Block from "./blocks/block.svelte";
 import { mount } from "svelte";
+
 async function initOnAdd(id,block){
    //mount 
+   let state_b= $derived(block)
    mount(Block,{target:document.querySelector(".cont"),props:{
-                block:block,
+                block: state_b,
                 schema_id:schema_id
               }})
   let block_to_add = block;
