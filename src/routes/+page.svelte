@@ -40,9 +40,11 @@
     let mSchema = z.object({
 
     })
-   let testschema={schema_id:"kkb",blocks:[{id:"1",name:"userName",type:"email",required:false,default:"e@g.com"},{id:"2",name:"email",type:"email",required:true,default:""}]}
+   let testschema={schema_id:"kkb",blocks:[{id:"1",name:"userName",type:"email",required:false},{id:"2",name:"email",type:"email",required:true}]}
     </script>
-<Schema onSchemaChange={(s)=>{
+<Schema schema={testschema} onZodSchema={(e)=>{
+
+}} onSchemaChange={(s)=>{
 console.log(s)
 }}></Schema>
     

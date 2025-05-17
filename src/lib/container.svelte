@@ -59,7 +59,7 @@
   })
   </script>
   
-  <div  id="container_{schema?.schema_id}" class="min-w-[200px] min-h-[80vh] flex gap-2 items-center justify-center flex-wrap overflow-auto w-full no-scrollbar mx-auto cont  max-w-[100vw] p-2 bg-base-100" bind:this={container}>
+  <div  id="container_{schema?.schema_id}" class="min-w-[200px] min-h-[80vh] flex gap-2 items-center justify-center flex-wrap overflow-auto w-full no-scrollbar mx-auto cont  max-w-[100vw] px-2 py-10 bg-base-100" bind:this={container}>
    
   
   </div>
